@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import App from './App';
+import FollowersColumn from './components/FollowersColumn';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test('renders Following in the sidebar', () => {
+  render(<FollowersColumn />);
+  const titleElement = screen.getByText(/Following/i);
+  expect(titleElement).toBeInTheDocument();
 });

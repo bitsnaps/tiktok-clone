@@ -14,7 +14,7 @@ const App = () => {
     <Header />
       <Switch>
         <Route path='/upload' component={Upload} />
-          <Route path='/' component={Home} />
+        <Route path='/' component={Home} />
       </Switch>
     </HashRouter>
   );
