@@ -7,6 +7,21 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 npx create-react-app tiktok-clone
 ```
 
+## Install required packages
+```
+npm i react-router-dom --save
+# netlify-cli to use serverless function
+npm install netlify-cli --save-dev
+npm install axios --save
+npm install @astrajs/collections --save
+```
+
+## Run with netlify
+This allows you to use serverless function on netlify:
+```
+netlify dev
+```
+P.S. The app will start on `http://localhost:8888/#`
 
 ## Available Scripts
 
