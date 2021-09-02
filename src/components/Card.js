@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Card = ({ user, toggleFollow }) => {
+const Card = ({ user, toggleFollow, deleteUser }) => {
 
   const timestamp = user.timestamp
   const timeStampReformat = timestamp.slice(2, 7)
@@ -34,6 +34,7 @@ const Card = ({ user, toggleFollow }) => {
           <i className="far fa-comment-dots"></i>
           <div className="social-tag">{user.comments}</div>
           <i className="far fa-share-square"></i>
+          <button onClick={() => deleteUser(user)}> delete</button>
         </div>
     </div>
   )

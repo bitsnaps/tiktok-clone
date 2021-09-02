@@ -21,6 +21,10 @@ const Home = () => {
     setUsers(results.data)
   }
 
+  const deleteUser = async(user) => {
+    axios.post('/.netlify/functions/delete', { userId: user.id} )
+  }
+
   if(userToToggle){
     const newValue = userToToggle.is_followed ? false: true
     const data = { is_followed: newValue }
@@ -62,6 +66,7 @@ const Home = () => {
         key={index}
         user={descendingUser}
         toggleFollow={userToToggle => setUserToToggle(userToToggle)}
+        deleteUser={() => deleteUser(descendingUser)}
       />
     ))}
     </div>
