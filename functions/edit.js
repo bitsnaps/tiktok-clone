@@ -16,13 +16,14 @@ exports.handler = async function (event, context, callback) {
     .namespace(process.env.ASTRA_DB_KEYSPACE)
     .collection(collection)
 
+  const body = JSON.parse(event.body)
+
     try {
-      // create a user subdocument
-      const res = await posts.find({})
+      // partially update a user subdocument
+      posts.update(body.userId, body.data)
+
       return {
-        statusCode: 200,
-        // This allows you to return an array
-        body: JSON.stringify(Object.keys(res).map( (i) => res[i] ))
+        statusCode: 200
       }
     } catch (e) {
       console.error(e)

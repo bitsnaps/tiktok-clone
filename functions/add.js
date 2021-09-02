@@ -1,6 +1,9 @@
+const faker = require('faker')
+
 const { createClient } = require("@astrajs/collections")
 
 const collection = 'posts'
+let id = faker.datatype.uuid()
 
 //checkout the doc for more: https://docs.datastax.com/en/astra/docs/astra-collection-client.html
 exports.handler = async function (event, context, callback) {
@@ -18,11 +21,9 @@ exports.handler = async function (event, context, callback) {
 
     try {
       // create a user subdocument
-      const res = await posts.find({})
+      await posts.create(id, event.body);
       return {
-        statusCode: 200,
-        // This allows you to return an array
-        body: JSON.stringify(Object.keys(res).map( (i) => res[i] ))
+        statusCode: 200
       }
     } catch (e) {
       console.error(e)

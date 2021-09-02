@@ -1,24 +1,179 @@
-# Getting Started with Create React App
+# TikTok clone example
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is an example for Jamstack web app using:
+- React bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- Serverless function from netlify-cli.
+
+Original example by [@kubowania](https://github.com/kubowania/stargate-tik-tok).
 
 ## Create the project
-```
+```bash
 npx create-react-app tiktok-clone
+cd tiktok-clone
+npm start
 ```
 
 ## Install required packages
-```
-npm i react-router-dom --save
-# netlify-cli to use serverless function
+```bash
+npm install react-router-dom --save
 npm install netlify-cli --save-dev
 npm install axios --save
+npm install faker --save
+```
+Notes:
+- `netlify-cli` to use serverless function
+- `axios` to make http request
+- `faker` to generate a unique `uuid` for storing objects.
+
+
+## AstraDB (DataStax)
+You can use AstraDB API to interact with Cassandra cluster.
+
+1- First you'll need to install `astrajs`:
+```bash
 npm install @astrajs/collections --save
 ```
 
+2- Then you need define environment variables in your system or at `.env` config file (`netlify` will automatically configure `.env` for you):
+```bash
+# You need to defined API keys:
+export ASTRA_DB_ID={databaseid}
+export ASTRA_DB_REGION={region}
+export ASTRA_DB_APPLICATION_TOKEN={token}
+```
+3- Now you're ready to interact with Cassandra cluster:
+
+You can use either Client with Nodejs using `ASTRA_DB_APPLICATION_TOKEN` like so:
+```javascript
+const { createClient } = require("@astrajs/collections");
+
+// create an {astra_db} client
+const astraClient = await createClient({
+    astraDatabaseId: process.env.ASTRA_DB_ID,
+    astraDatabaseRegion: process.env.ASTRA_DB_REGION,
+    applicationToken: process.env.ASTRA_DB_APPLICATION_TOKEN,
+});
+
+// create a shortcut to the users collection in the app namespace/keyspace
+// collections are created automatically
+const usersCollection = astraClient.namespace("app").collection("users");
+
+// get a single user by document id
+const user = await usersCollection.get("cliff@wicklow.com");
+
+// get a subdocument by path
+const userBlogComments = await usersCollection.get("cliff@wicklow.com/blog/comments");
+
+// search a collection of documents
+const users = await usersCollection.find({ name: { $eq: "Cliff" } });
+
+// find a single user
+const user = await usersCollection.findOne({ name: { $eq: "dang" } });
+
+// create a new document (a documentId is generated)
+const user = await usersCollection.create({
+  name: "New Guy",
+});
+
+// create a new user (specifying documentId)
+const user = await usersCollection.create("cliff@wicklow.com", {
+  name: "cliff",
+});
+
+// create a user subdocument
+const user = await usersCollection.create("cliff@wicklow.com/blog", {
+  title: "new blog",
+});
+
+// partially update user
+const user = await usersCollection.update("cliff@wicklow.com", {
+  name: "cliff",
+});
+
+// partially update a user subdocument
+const userBlog = await usersCollection.update("cliff@wicklow.com/blog", {
+  title: "my spot",
+});
+
+// replace a user subdocumet
+const userBlog = await usersCollection.replace("cliff@wicklow.com/blog", {
+  title: "New Blog",
+});
+
+// delete a user
+const user = await usersCollection.delete("cliff@wicklow.com");
+
+// delete a user subdocument
+const userBlog = await usersCollection.delete("cliff@wicklow.com/blog");
+```
+
+or using the REST API using `username/password` like so:
+
+```bash
+# You need to defined API keys & username/password:
+export ASTRA_DB_ID={databaseid}
+export ASTRA_DB_REGION={region}
+export ASTRA_DB_USERNAME={username}
+export ASTRA_DB_PASSWORD={password}
+```
+REST API:
+```javascript
+const { createClient } = require("@astrajs/rest");
+
+// create an {astra_db} client
+const astraClient = await createClient({
+    astraDatabaseId: process.env.ASTRA_DB_ID,
+    astraDatabaseRegion: process.env.ASTRA_DB_REGION,
+    username: process.env.ASTRA_DB_USERNAME,
+    password: process.env.ASTRA_DB_PASSWORD,
+});
+
+const basePath = "/api/rest/v2/KEYSPACES/<namespace>/collections/<collectionName>";
+
+// get a single user by document id
+const { data, status } = await astraClient.get(`${basePath}/<documentId>`);
+
+// get a subdocument by path
+const { data, status } = await astraClient.get(`${basePath}/<documentId>/<subdocument>/<subdocument>`);
+
+// search a collection of documents
+const { data, status } = await astraClient.get(basePath, {
+  params: {
+    where: {
+      name: { $eq: "<documentId>" }
+    }
+  }
+});
+
+// create a new user without a document id
+const { data, status } = await astraClient.post(basePath, {
+  name: "<documentId>",
+});
+
+// create a new user with a document id
+const { data, status } = await astraClient.put(`${basePath}/<documentId>`, {
+  name: "cliff",
+});
+
+// create a user subdocument
+const { data, status } = await astraClient.put(`${basePath}/<documentId>/<subdocument>`, {
+  title: "new blog",
+});
+
+// partially update user
+const { data, status } = await astraClient.patch(`${basePath}/<documentId>`, {
+  name: "cliff",
+});
+
+// delete a user
+const { data, status } = await astraClient.delete(`${basePath}/<documentId>`);
+```
+Read more at: https://docs.datastax.com/en/astra/docs/astra-collection-client.html
+
+
 ## Run with netlify
 This allows you to use serverless function on netlify:
-```
+```bash
 netlify dev
 ```
 P.S. The app will start on `http://localhost:8888/#`
