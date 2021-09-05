@@ -128,7 +128,7 @@ const astraClient = await createClient({
     password: process.env.ASTRA_DB_PASSWORD,
 });
 
-const basePath = "/api/rest/v2/KEYSPACES/<namespace>/collections/<collectionName>";
+const basePath = "/api/rest/v2/keyspaces/<namespace>/<collectionName>";
 
 // get a single user by document id
 const { data, status } = await astraClient.get(`${basePath}/<documentId>`);
